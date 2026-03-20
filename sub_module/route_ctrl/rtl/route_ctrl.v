@@ -4,6 +4,7 @@ module route_ctrl(
     input [3:0] tvalid,
     input [3:0] tdest,
     input [3:0] tlast,
+    input [1:0] tready,
     output [3:0] grant0,
     output [3:0] grant1
 );
@@ -48,7 +49,8 @@ module route_ctrl(
         .rst_n(rst_n),
         .req(req0),
         .tlast(tlast0),
-        .grant(grant0_w)
+        .grant(grant0_w),
+        .tready(tready[0])
     );
 
     arbiter_rr u1 (
@@ -56,7 +58,8 @@ module route_ctrl(
         .rst_n(rst_n),
         .req(req1),
         .tlast(tlast1),
-        .grant(grant1_w)
+        .grant(grant1_w),
+        .tready(tready[1])
     );
 
 endmodule
