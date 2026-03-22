@@ -1,35 +1,22 @@
-class fifo_basic_seq extends uvm_sequence #(fifo_seq_item #());
-  `uvm_object_utils(fifo_basic_seq)
+class base_seq extends uvm_sequence #(router_seq_item #());
+  `uvm_object_utils(base_seq)
 
-  rand bit wr_en_val;
-  rand bit rd_en_val;
+  int unsigned num_pkts = 3;
 
-  function new(string name = "fifo_basic_seq");
+  function new(string name = "base_seq");
     super.new(name);
   endfunction
 
   task body();
-    fifo_seq_item #() item;
 
-    
-    // 8 write
-    for(int i = 0; i < 8; i++) begin
-      item = fifo_seq_item #()::type_id::create("item");
-      start_item(item);
-      	if(!item.randomize() with {wr_en==1; rd_en==0;}) begin
-  			`uvm_fatal(get_type_name(), "Randomization failed!")
-		end
-      finish_item(item);
-    end
-
-    // 8 read
-    for(int i = 0; i < 8; i++) begin
-      item = fifo_seq_item #()::type_id::create("item");
-      start_item(item);
-      if(!item.randomize() with {wr_en==0; rd_en==1;}) begin
-  			`uvm_fatal(get_type_name(), "Randomization failed!")
-		end
-      finish_item(item);
+    for (int i=0; i<num_pkts; i++) begin
+      router_seq_item #() item;
+      item = router_seq_item #()::type_id::create("item");
+      
+      start_item(item);  // sequencer에 item 준비 완료를 알림
+      if (!item.randomize())  // port_id, data[], tdest를 constraint 기반으로 랜덤 생성
+        `uvm_fatal(get_type_name(), "Randomization failed!")
+      finish_item(item);  // driver로 item을 전달
     end
     
   endtask
