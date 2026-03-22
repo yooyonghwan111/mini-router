@@ -16,29 +16,7 @@ Each input port has an internal FIFO for buffering. Arbitration between competin
 ---
 
 ## 2. Block Diagram
-
-```
-                        ┌─────────────────────────────────────────────┐
-                        │              mini_router_top                │
-                        │                                             │
-  s_tdata_0/valid/last  │  ┌──────────┐                              │
- ──────────────────────►│  │ sync_fifo│─┐                            │
-  s_tdest[0], s_tready  │  └──────────┘ │  ┌────────────┐           │
-                        │               ├─►│            │  grant0   │ m_tdata_0
-  s_tdata_1/valid/last  │  ┌──────────┐ │  │ route_ctrl │──────────►│ m_tvalid[0]
- ──────────────────────►│  │ sync_fifo│─┤  │            │  grant1   │ m_tlast[0]
-  s_tdest[1], s_tready  │  └──────────┘ │  │ (arbiter   │──────────►│
-                        │               ├─►│  _rr × 2)  │           │ m_tdata_1
-  s_tdata_2/valid/last  │  ┌──────────┐ │  └────────────┘           │ m_tvalid[1]
- ──────────────────────►│  │ sync_fifo│─┤        │                  │ m_tlast[1]
-  s_tdest[2], s_tready  │  └──────────┘ │        ▼                  │
-                        │               ├─►┌────────────┐           │
-  s_tdata_3/valid/last  │  ┌──────────┐ │  │  crossbar  │──────────►│
- ──────────────────────►│  │ sync_fifo│─┘  │  (4 × 2)   │           │
-  s_tdest[3], s_tready  │  └──────────┘    └────────────┘           │
-                        │                                             │
-                        └─────────────────────────────────────────────┘
-```
+![mini_router_top Block Diagram](../System_Architect/mini_router_architecture.png)
 
 ---
 
