@@ -45,6 +45,10 @@ module mini_router_top #(
 	
 	assign data_to_data = {{data_to_data_3},{data_to_data_2},{data_to_data_1},{data_to_data_0}};
 
+	// [3:0] s_tready
+	assign s_tready = ~fifo_full;
+
+
 	sync_fifo  #(.D_WIDTH(D_WIDTH), .DEPTH(DEPTH)) u_fifo_0 (
 		.clk(clk),
 		.rst_n(rst_n),
@@ -106,16 +110,13 @@ module mini_router_top #(
 		.grant0(grant0_o),
 		.grant1(grant1_o),
 		.tdata_in(data_to_data), // (D_WIDTH*4) 32bit
-		.tvalid0(),
-		.tlast0(),
-		.tdata0(),
-		.tvalid1(),
-		.tlast1(),
-		.tdata1(),
-		
+		.tvalid0(m_tvalid[0]),
+		.tlast0(m_tlast[0]),
+		.tdata0(m_tdata_0),
+		.tvalid1(m_tvalid[1]),
+		.tlast1(m_tlast[1]),
+		.tdata1(m_tdata_1)
+	
 	);
-
-
-
 
 endmodule
