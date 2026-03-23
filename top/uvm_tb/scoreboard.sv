@@ -29,64 +29,67 @@ class router_scoreboard #(parameter D_WIDTH=8) extends uvm_scoreboard;
     virtual function void write_input(router_seq_item #() data);
         case (data.port_id)
             2'd0 : begin
-                if (data.s_tdest[0] == 0)  
+                if (data.s_tdest[0] == 0) begin
                     exp_queue_0.push_back(data.s_tdata_0);
-                else
+                    `uvm_info(get_type_name(), $sformatf("input0 -> queue0 (%0h)", data.s_tdata_0), UVM_LOW)
+                end else begin
                     exp_queue_1.push_back(data.s_tdata_0);
-            end
-
-           2'd1 : begin
-                if (data.s_tdest[1] == 0)  
-                    exp_queue_0.push_back(data.s_tdata_1);
-                else
-                    exp_queue_1.push_back(data.s_tdata_1);            
-           end
-
-           2'd2 : begin
-                if (data.s_tdest[2] == 0)  
-                    exp_queue_0.push_back(data.s_tdata_2);
-                else
-                    exp_queue_1.push_back(data.s_tdata_2);            
-           end
-
-           2'd3 : begin
-                if (data.s_tdest[3] == 0)  
-                    exp_queue_0.push_back(data.s_tdata_3);
-                else
-                    exp_queue_1.push_back(data.s_tdata_3);            
-           end            
-
-        endcase
-
-    endfunction 
-
-
-    virtual function void write_output(router_seq_item #() data);
-
-        case (data.port_id)
-
-            2'd0 : begin
-                exp = exp_queue_0.pop_front();
-
-                if (exp == data.m_tdata_0)
-                    `uvm_info(get_type_name(), $sformatf("PASS: port0 expected=%0h, actual=%0h", exp, data.m_tdata_0), UVM_LOW)
-                else
-                    `uvm_error(get_type_name(), $sformatf("FAIL: port0 expected=%0h, actual=%0h", exp, data.m_tdata_0))
+                    `uvm_info(get_type_name(), $sformatf("input0 -> queue1 (%0h)", data.s_tdata_0), UVM_LOW)
+                end
             end
 
             2'd1 : begin
-                exp = exp_queue_1.pop_front();
-
-                if (exp == data.m_tdata_1)
-                    `uvm_info(get_type_name(), $sformatf("PASS: port1 expected=%0h, actual=%0h", exp, data.m_tdata_1), UVM_LOW)
-                else
-                    `uvm_error(get_type_name(), $sformatf("FAIL: port1 expected=%0h, actual=%0h", exp, data.m_tdata_1))
+                if (data.s_tdest[1] == 0) begin
+                    exp_queue_0.push_back(data.s_tdata_1);
+                    `uvm_info(get_type_name(), $sformatf("input1 -> queue0 (%0h)", data.s_tdata_1), UVM_LOW)
+                end else begin
+                    exp_queue_1.push_back(data.s_tdata_1);
+                    `uvm_info(get_type_name(), $sformatf("input1 -> queue1 (%0h)", data.s_tdata_1), UVM_LOW)
+                end
             end
 
+            2'd2 : begin
+                if (data.s_tdest[2] == 0) begin
+                    exp_queue_0.push_back(data.s_tdata_2);
+                    `uvm_info(get_type_name(), $sformatf("input2 -> queue0 (%0h)", data.s_tdata_2), UVM_LOW)
+                end else begin
+                    exp_queue_1.push_back(data.s_tdata_2);
+                    `uvm_info(get_type_name(), $sformatf("input2 -> queue1 (%0h)", data.s_tdata_2), UVM_LOW)
+                end
+            end
+
+            2'd3 : begin
+                if (data.s_tdest[3] == 0) begin
+                    exp_queue_0.push_back(data.s_tdata_3);
+                    `uvm_info(get_type_name(), $sformatf("input3 -> queue0 (%0h)", data.s_tdata_3), UVM_LOW)
+                end else begin
+                    exp_queue_1.push_back(data.s_tdata_3);
+                    `uvm_info(get_type_name(), $sformatf("input3 -> queue1 (%0h)", data.s_tdata_3), UVM_LOW)
+                end
+            end
         endcase
+    endfunction
 
-    endfunction 
 
+virtual function void write_output(router_seq_item #() data);
+    case (data.port_id)
+        2'd0 : begin
+            exp = exp_queue_0.pop_front();
+            if (exp == data.m_tdata_0)
+                `uvm_info(get_type_name(), $sformatf("[Compare] [PASS] expected(queue0)=%0h, actual(output0)=%0h", exp, data.m_tdata_0), UVM_LOW)
+            else
+                `uvm_error(get_type_name(), $sformatf("[Compare] [FAIL] expected(queue0)=%0h, actual(output0)=%0h", exp, data.m_tdata_0))
+        end
+
+        2'd1 : begin
+            exp = exp_queue_1.pop_front();
+            if (exp == data.m_tdata_1)
+                `uvm_info(get_type_name(), $sformatf("[Compare] [PASS] expected(queue1)=%0h, actual(output1)=%0h", exp, data.m_tdata_1), UVM_LOW)
+            else
+                `uvm_error(get_type_name(), $sformatf("[Compare] [FAIL] expected(queue1)=%0h, actual(output1)=%0h", exp, data.m_tdata_1))
+        end
+    endcase
+endfunction
     
 
 

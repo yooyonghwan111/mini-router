@@ -31,8 +31,9 @@ class router_input_monitor extends uvm_monitor;
       @ (posedge vif.clk);
 
         //port 0
-        if (vif.s_tvalid[0] && vif.s_tready[0] && vif.s_tlast[0]) begin
-
+        //if (vif.s_tvalid[0] && vif.s_tready[0] && vif.s_tlast[0]) begin
+        if (vif.s_tvalid[0] && vif.s_tready[0]) begin
+           
             data_obj = router_seq_item#()::type_id::create("data_obj", this);
 
             data_obj.port_id = 0; 
@@ -45,8 +46,9 @@ class router_input_monitor extends uvm_monitor;
         end
 
         //port 1
-        if (vif.s_tvalid[1] && vif.s_tready[1] && vif.s_tlast[1]) begin
-
+        //if (vif.s_tvalid[1] && vif.s_tready[1] && vif.s_tlast[1]) begin
+        if (vif.s_tvalid[1] && vif.s_tready[1]) begin
+            
             data_obj = router_seq_item#()::type_id::create("data_obj", this);
 
             data_obj.port_id = 1; 
@@ -59,8 +61,9 @@ class router_input_monitor extends uvm_monitor;
         end
 
         //port 2
-        if (vif.s_tvalid[2] && vif.s_tready[2] && vif.s_tlast[2]) begin
-
+        //if (vif.s_tvalid[2] && vif.s_tready[2] && vif.s_tlast[2]) begin
+        if (vif.s_tvalid[2] && vif.s_tready[2]) begin
+           
             data_obj = router_seq_item#()::type_id::create("data_obj", this);
 
             data_obj.port_id = 2; 
@@ -73,8 +76,9 @@ class router_input_monitor extends uvm_monitor;
         end
 
         //port 3
-        if (vif.s_tvalid[3] && vif.s_tready[3] && vif.s_tlast[3]) begin
-
+        //if (vif.s_tvalid[3] && vif.s_tready[3] && vif.s_tlast[3]) begin
+        if (vif.s_tvalid[3] && vif.s_tready[3]) begin
+      
             data_obj = router_seq_item#()::type_id::create("data_obj", this);
 
             data_obj.port_id = 3; 

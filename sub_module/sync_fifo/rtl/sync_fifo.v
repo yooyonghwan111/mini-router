@@ -1,15 +1,15 @@
 module sync_fifo #(parameter DEPTH=8 , D_WIDTH=8)(
 
-	input					        clk,
-	input						     rst_n,
-	input							  wr_en,
-	input							  rd_en,
-	input			[D_WIDTH-1:0] din,
+	input						clk,
+	input						rst_n,
+	input						wr_en,
+	input						rd_en,
+	input		[D_WIDTH-1:0]	din,
 
-	output reg	[D_WIDTH-1:0] dout, 
+	output reg	[D_WIDTH-1:0]	dout, 
 
-	output						  full,
-	output						  empty
+	output						full,
+	output						empty
 );
 
 	localparam P_INDEX = $clog2(DEPTH);

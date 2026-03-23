@@ -13,8 +13,6 @@ module crossbar #(parameter D_WIDTH=8)(
     output                      tvalid1,  
     output                      tlast1, 
     output	[D_WIDTH-1:0]       tdata1
-
-
 	);
 
     assign tdata0 = (grant0 == 4'b0001) ? tdata_in [7:0] : 
