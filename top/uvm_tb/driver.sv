@@ -29,8 +29,6 @@ class router_driver extends uvm_driver #(router_seq_item #());
       
       for(int i=0; i<item.data.size(); i++) begin
 
-        // @(posedge vif.clk);
-        //   wait(vif.s_tready[item.port_id])
 
         // @(posedge clk) 먼저, 그 다음 tready 체크
         @(posedge vif.clk);

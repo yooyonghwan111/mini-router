@@ -30,6 +30,9 @@ module tb_top;
     initial begin
         dut_if1.rst_n = 0;
         dut_if1.m_tready = 2'b11;
+        dut_if1.s_tvalid = 4'b0;
+        dut_if1.s_tlast  = 4'b0;
+        dut_if1.s_tdest  = 4'b0;    
         #20 dut_if1.rst_n = 1;
     end
   
