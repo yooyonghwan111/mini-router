@@ -30,8 +30,7 @@ class router_output_monitor extends uvm_monitor;
     forever begin
       
       @ (posedge vif.clk);
-        //if (vif.m_tvalid[0] && vif.m_tready[0] && vif.m_tlast[0]) begin
-        if (vif.m_tvalid[0] && vif.m_tready[0]) begin
+        if (vif.m_tvalid[0] && vif.m_tready[0] && vif.m_tlast[0]) begin
 
             data_obj = router_seq_item#()::type_id::create("data_obj", this);
 
@@ -43,8 +42,7 @@ class router_output_monitor extends uvm_monitor;
             ap_mon.write(data_obj); // valid transfer인 경우만 scoreboard에게 넘겨줌
         end
 
-        //if (vif.m_tvalid[1] && vif.m_tready[1] && vif.m_tlast[1]) begin
-        if (vif.m_tvalid[1] && vif.m_tready[1]) begin
+        if (vif.m_tvalid[1] && vif.m_tready[1] && vif.m_tlast[1]) begin
 
             data_obj = router_seq_item#()::type_id::create("data_obj", this);
 
