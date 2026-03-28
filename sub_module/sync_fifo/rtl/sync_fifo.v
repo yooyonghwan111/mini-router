@@ -1,15 +1,15 @@
-module sync_fifo #(parameter DEPTH=8 , D_WIDTH=8)(
+module sync_fifo #(parameter DEPTH=4 , D_WIDTH=8)(
 
-	input						clk,
-	input						rst_n,
-	input						wr_en,
-	input						rd_en,
-	input		[D_WIDTH-1:0]	din,
+	input					        clk,
+	input						    rst_n,
+	input							wr_en,
+	input							rd_en,
+	input		[D_WIDTH-1:0]	tdata_in,
 
-	output reg	[D_WIDTH-1:0]	dout, 
+	output reg	[D_WIDTH-1:0] tdata_out, 
 
-	output						full,
-	output						empty
+	output						   full,
+	output						   empty
 );
 
 	localparam P_INDEX = $clog2(DEPTH);
@@ -28,7 +28,7 @@ module sync_fifo #(parameter DEPTH=8 , D_WIDTH=8)(
 
 		else begin
 			if (wr_en && !full) begin
-				fifo[wptr[P_INDEX-1:0]] <= din;
+				fifo[wptr[P_INDEX-1:0]] <= tdata_in;
 				wptr <= wptr+1'b1;
 			end
 		end
@@ -39,12 +39,12 @@ module sync_fifo #(parameter DEPTH=8 , D_WIDTH=8)(
 	always @ (posedge clk) begin
 		if(!rst_n) begin
 			rptr <=0;
-			dout <=0;
+			tdata_out <=0;
 		end
 
 		else begin
 			if(rd_en && !empty) begin
-				dout <= fifo[rptr[P_INDEX-1:0]];
+				tdata_out <= fifo[rptr[P_INDEX-1:0]];
 				rptr <= rptr+1'b1;
 			end
 		end
