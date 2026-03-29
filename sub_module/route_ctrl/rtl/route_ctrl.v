@@ -1,65 +1,63 @@
 module route_ctrl(
+
     input clk, 
     input rst_n,
-    input [3:0] tvalid,
-    input [3:0] tdest,
-    input [3:0] tlast,
-    input [1:0] tready,
-    output [3:0] grant0,
-    output [3:0] grant1
+    
+    input valid_0,
+    input valid_1,
+    input valid_2,
+    input valid_3,
+
+    input dest_0,
+    input dest_1,
+    input dest_2,
+    input dest_3,
+
+    input last_0,
+    input last_1,
+
+    input ready_0,
+    input ready_1,
+
+    output [3:0] grant_0,
+    output [3:0] grant_1
+
 );
+    // arbiter_0 (grant_0)
+    wire [3:0] req_0;
 
-    wire [3:0] req0;
-    wire [3:0] req1;
-
-    wire tlast0;
-    wire tlast1;
-
-    wire [3:0] grant0_w;
-    wire [3:0] grant1_w;
-
-    assign req0[0] = tvalid[0] && (tdest[0]==1'b0);
-    assign req0[1] = tvalid[1] && (tdest[1]==1'b0);
-    assign req0[2] = tvalid[2] && (tdest[2]==1'b0);
-    assign req0[3] = tvalid[3] && (tdest[3]==1'b0);
-
-    assign req1[0] = tvalid[0] && (tdest[0]==1'b1);
-    assign req1[1] = tvalid[1] && (tdest[1]==1'b1);
-    assign req1[2] = tvalid[2] && (tdest[2]==1'b1);
-    assign req1[3] = tvalid[3] && (tdest[3]==1'b1);
-
-    assign tlast0 = (grant0_w == 4'b0001) ? tlast[0] : 
-                    (grant0_w == 4'b0010) ? tlast[1] : 
-                    (grant0_w == 4'b0100) ? tlast[2] : 
-                    (grant0_w == 4'b1000) ? tlast[3] : 
-                    1'b0;        
-
-    assign tlast1 = (grant1_w == 4'b0001) ? tlast[0] : 
-                    (grant1_w == 4'b0010) ? tlast[1] : 
-                    (grant1_w == 4'b0100) ? tlast[2] : 
-                    (grant1_w == 4'b1000) ? tlast[3] : 
-                    1'b0;                            
+    assign req_0[0] = valid_0 && (dest_0 == 1'b0);
+    assign req_0[1] = valid_1 && (dest_1 == 1'b0);
+    assign req_0[2] = valid_2 && (dest_2 == 1'b0);
+    assign req_0[3] = valid_3 && (dest_3 == 1'b0);
 
 
-    assign grant0 = grant0_w;
-    assign grant1 = grant1_w;
+    // arbiter_1 (grant_1)
+    wire [3:0] req_1;
 
+    assign req_1[0] = valid_0 && (dest_0 == 1'b1);
+    assign req_1[1] = valid_1 && (dest_1 == 1'b1);
+    assign req_1[2] = valid_2 && (dest_2 == 1'b1);
+    assign req_1[3] = valid_3 && (dest_3 == 1'b1);
+
+    
     arbiter_rr u0 (
         .clk(clk),
         .rst_n(rst_n),
-        .req(req0),
-        .tlast(tlast0),
-        .grant(grant0_w),
-        .tready(tready[0])
+        .req(req_0),
+        .ready(ready_0),
+        .last(last_0),
+        .grant(grant_0)
     );
 
     arbiter_rr u1 (
         .clk(clk),
         .rst_n(rst_n),
-        .req(req1),
-        .tlast(tlast1),
-        .grant(grant1_w),
-        .tready(tready[1])
+        .req(req_1),
+        .ready(ready_1),
+        .last(last_1),
+        .grant(grant_1)
     );
+
 
 endmodule
