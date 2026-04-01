@@ -19,6 +19,9 @@ class router_basic_test extends uvm_test;
     phase.raise_objection(this);
 
     basic_seq.start(m_env.a_agent.seqr);
+   
+    // Wait for last packet to propagate through DUT to output
+  #600;
 
     phase.drop_objection(this);
     
