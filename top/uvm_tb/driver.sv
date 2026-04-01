@@ -37,28 +37,28 @@ class router_driver extends uvm_driver #(router_seq_item #());
                 case (item.port_id)
                     2'd0: begin
                         vif.s_tdata_0  <= item.data[i];
-                        vif.s_tid_0    <= item.tid;                              // [추가]
+                        vif.s_tid_0    <= item.tid;                              
                         vif.s_tdest_0  <= item.tdest;
                         vif.s_tvalid_0 <= 1;
                         vif.s_tlast_0  <= (i == item.data.size()-1) ? 1 : 0;
                     end
                     2'd1: begin
                         vif.s_tdata_1  <= item.data[i];
-                        vif.s_tid_1    <= item.tid;                              // [추가]
+                        vif.s_tid_1    <= item.tid;                              
                         vif.s_tdest_1  <= item.tdest;
                         vif.s_tvalid_1 <= 1;
                         vif.s_tlast_1  <= (i == item.data.size()-1) ? 1 : 0;
                     end
                     2'd2: begin
                         vif.s_tdata_2  <= item.data[i];
-                        vif.s_tid_2    <= item.tid;                              // [추가]
+                        vif.s_tid_2    <= item.tid;                              
                         vif.s_tdest_2  <= item.tdest;
                         vif.s_tvalid_2 <= 1;
                         vif.s_tlast_2  <= (i == item.data.size()-1) ? 1 : 0;
                     end
                     2'd3: begin
                         vif.s_tdata_3  <= item.data[i];
-                        vif.s_tid_3    <= item.tid;                              // [추가]
+                        vif.s_tid_3    <= item.tid;                              
                         vif.s_tdest_3  <= item.tdest;
                         vif.s_tvalid_3 <= 1;
                         vif.s_tlast_3  <= (i == item.data.size()-1) ? 1 : 0;

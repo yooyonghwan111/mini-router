@@ -5,9 +5,15 @@ class router_scoreboard #(parameter D_WIDTH=8) extends uvm_scoreboard;
 
     `uvm_component_utils(router_scoreboard)
 
-    bit [D_WIDTH-1:0] exp_queue_0[$]; // output port 0 expected
-    bit [D_WIDTH-1:0] exp_queue_1[$]; // output port 1 expected
-    bit [D_WIDTH-1:0] exp;
+    //bit [D_WIDTH-1:0] exp_queue_0[$]; // output port 0 expected
+    bit [D_WIDTH-1:0] exp_queue_0[$][$];  // packet 단위 queue
+
+    //bit [D_WIDTH-1:0] exp_queue_1[$]; // output port 1 expected
+    bit [D_WIDTH-1:0] exp_queue_1[$][$];  // packet 단위 queue
+
+    
+    //bit [D_WIDTH-1:0] exp;
+    bit [D_WIDTH-1:0] exp_pkt [$];
 
     uvm_analysis_imp_input  #(router_seq_item #(), router_scoreboard #()) ap_input_scb;
     uvm_analysis_imp_output #(router_seq_item #(), router_scoreboard #()) ap_output_scb;
@@ -22,75 +28,64 @@ class router_scoreboard #(parameter D_WIDTH=8) extends uvm_scoreboard;
     endfunction
 
     // input monitor → tdest 보고 exp_queue에 push
-    // [변경] packed 배열 인덱스 → 개별 신호 참조
     virtual function void write_input(router_seq_item #() data);
-        case (data.port_id)
-            2'd0: begin
-                if (data.s_tdest_0 == 0) begin
-                    exp_queue_0.push_back(data.s_tdata_0);
-                    `uvm_info(get_type_name(), $sformatf("input0 -> queue0 (data=%0h tid=%0b)", data.s_tdata_0, data.s_tid_0), UVM_LOW)
-                end else begin
-                    exp_queue_1.push_back(data.s_tdata_0);
-                    `uvm_info(get_type_name(), $sformatf("input0 -> queue1 (data=%0h tid=%0b)", data.s_tdata_0, data.s_tid_0), UVM_LOW)
-                end
-            end
-            2'd1: begin
-                if (data.s_tdest_1 == 0) begin
-                    exp_queue_0.push_back(data.s_tdata_1);
-                    `uvm_info(get_type_name(), $sformatf("input1 -> queue0 (data=%0h tid=%0b)", data.s_tdata_1, data.s_tid_1), UVM_LOW)
-                end else begin
-                    exp_queue_1.push_back(data.s_tdata_1);
-                    `uvm_info(get_type_name(), $sformatf("input1 -> queue1 (data=%0h tid=%0b)", data.s_tdata_1, data.s_tid_1), UVM_LOW)
-                end
-            end
-            2'd2: begin
-                if (data.s_tdest_2 == 0) begin
-                    exp_queue_0.push_back(data.s_tdata_2);
-                    `uvm_info(get_type_name(), $sformatf("input2 -> queue0 (data=%0h tid=%0b)", data.s_tdata_2, data.s_tid_2), UVM_LOW)
-                end else begin
-                    exp_queue_1.push_back(data.s_tdata_2);
-                    `uvm_info(get_type_name(), $sformatf("input2 -> queue1 (data=%0h tid=%0b)", data.s_tdata_2, data.s_tid_2), UVM_LOW)
-                end
-            end
-            2'd3: begin
-                if (data.s_tdest_3 == 0) begin
-                    exp_queue_0.push_back(data.s_tdata_3);
-                    `uvm_info(get_type_name(), $sformatf("input3 -> queue0 (data=%0h tid=%0b)", data.s_tdata_3, data.s_tid_3), UVM_LOW)
-                end else begin
-                    exp_queue_1.push_back(data.s_tdata_3);
-                    `uvm_info(get_type_name(), $sformatf("input3 -> queue1 (data=%0h tid=%0b)", data.s_tdata_3, data.s_tid_3), UVM_LOW)
-                end
-            end
-        endcase
+
+        if (data.s_tdest == 0) begin
+            exp_queue_0.push_back(data.s_pkt_data);
+            //`uvm_info(get_type_name(), $sformatf("input0 -> queue0 (data=%0h tid=%0b)", data.s_tdata_0, data.s_tid_0), UVM_LOW)
+                
+        end 
+        else begin // data.s_tdest == 1
+            exp_queue_1.push_back(data.s_pkt_data);
+            //`uvm_info(get_type_name(), $sformatf("input0 -> queue1 (data=%0h tid=%0b)", data.s_tdata_0, data.s_tid_0), UVM_LOW)
+        end
+
+        `uvm_info(get_type_name(), $sformatf("input%0d -> queue%0d: tid=%0b beats=%0d first=%0h",
+                                                    data.s_port_id, data.s_tdest, data.s_tid, data.s_pkt_data.size(), data.s_pkt_data[0]), UVM_LOW)
     endfunction
 
+
+
     // output monitor → exp_queue에서 pop해서 비교
-    // [변경] packed 배열 인덱스 → 개별 신호 참조
     virtual function void write_output(router_seq_item #() data);
-        case (data.port_id)
-            2'd0: begin
-                if (exp_queue_0.size() == 0) begin
-                    `uvm_error(get_type_name(), "exp_queue_0 is empty!")
-                    return;
-                end
-                exp = exp_queue_0.pop_front();
-                if (exp == data.m_tdata_0)
-                    `uvm_info(get_type_name(), $sformatf("[PASS] output0: exp=%0h actual=%0h tid=%0b", exp, data.m_tdata_0, data.m_tid_0), UVM_LOW)
-                else
-                    `uvm_error(get_type_name(), $sformatf("[FAIL] output0: exp=%0h actual=%0h tid=%0b", exp, data.m_tdata_0, data.m_tid_0))
+
+        if (data.m_port_id == 0) begin // output 0
+
+            if (exp_queue_0.size() == 0) begin
+                `uvm_error(get_type_name(), "exp_queue_0 is empty!")
+                return;
             end
-            2'd1: begin
-                if (exp_queue_1.size() == 0) begin
-                    `uvm_error(get_type_name(), "exp_queue_1 is empty!")
-                    return;
-                end
-                exp = exp_queue_1.pop_front();
-                if (exp == data.m_tdata_1)
-                    `uvm_info(get_type_name(), $sformatf("[PASS] output1: exp=%0h actual=%0h tid=%0b", exp, data.m_tdata_1, data.m_tid_1), UVM_LOW)
-                else
-                    `uvm_error(get_type_name(), $sformatf("[FAIL] output1: exp=%0h actual=%0h tid=%0b", exp, data.m_tdata_1, data.m_tid_1))
+
+            exp_pkt = exp_queue_0.pop_front();
+        end 
+        
+
+        else begin //data.m_port_id == 1 (output 1)
+            if (exp_queue_1.size() == 0) begin
+                `uvm_error(get_type_name(), "exp_queue_1 is empty!")
+                return;
             end
-        endcase
+            exp_pkt = exp_queue_1.pop_front();
+        end
+
+
+        // beat 수 비교
+        if (exp_pkt.size() != data.m_pkt_data.size()) begin
+            `uvm_error(get_type_name(), $sformatf("[FAIL] port%0d beat count mismatch: exp=%0d actual=%0d",
+                                                        data.m_port_id, exp_pkt.size(), data.m_pkt_data.size()))
+            return;
+        end
+
+        // beat by beat 비교
+        foreach (exp_pkt[i]) begin
+
+            if (exp_pkt[i] != data.m_pkt_data[i])
+                `uvm_error(get_type_name(), $sformatf("[FAIL] port%0d beat[%0d]: exp=%0h actual=%0h",
+                                                                data.m_port_id, i, exp_pkt[i], data.m_pkt_data[i]))
+            else
+                `uvm_info(get_type_name(), $sformatf("[PASS] port%0d beat[%0d]: exp=%0h actual=%0h",
+                                                                data.m_port_id, i, exp_pkt[i], data.m_pkt_data[i]), UVM_LOW)
+        end
     endfunction
 
 endclass
