@@ -32,6 +32,25 @@ module tb_top;
         .m_tvalid_0 (dut_if1.m_tvalid_0), .m_tvalid_1 (dut_if1.m_tvalid_1)
     );
 
+
+    // // SVA bind
+    // bind mini_router_top mini_router_sva_if #(.D_WIDTH(8)) sva_if (
+    //     .clk      (clk),
+    //     .rst_n    (rst_n),
+    //     .s_tvalid (s_tvalid),
+    //     .s_tready (s_tready),
+    //     .s_tlast  (s_tlast),
+    //     .s_tdest  (s_tdest),
+    //     .s_tdata_0(s_tdata_0),
+    //     .s_tdata_1(s_tdata_1),
+    //     .s_tdata_2(s_tdata_2),
+    //     .s_tdata_3(s_tdata_3),
+    //     .m_tvalid (m_tvalid),
+    //     .m_tready (m_tready),
+    //     .m_tlast  (m_tlast)
+    // );
+
+
     initial begin
         dut_if1.rst_n    = 0;
         // [변경] 개별 신호로 초기화
