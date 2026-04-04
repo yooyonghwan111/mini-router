@@ -55,7 +55,6 @@ interface mini_router_sva_if #(parameter D_WIDTH=8) (
                 @(posedge clk) disable iff (!rst_n)
                 s_tvalid[i] && !s_tready[i] |=> s_tvalid[i];
             endproperty
-
             assert property (p_s_tvalid_stable)
                 else $error("[SVA] s_tvalid deasserted before handshake! port=%0d", i);
 
@@ -128,6 +127,7 @@ interface mini_router_sva_if #(parameter D_WIDTH=8) (
     assert property (p_m_reset_tvalid)
         else $error("[SVA] m_tvalid not LOW during reset!");
 
+   
     // =====================
     // 3. Packet Rules
     // =====================
@@ -167,6 +167,7 @@ interface mini_router_sva_if #(parameter D_WIDTH=8) (
             endproperty
             assert property (p_tlast_preserved)
                 else $error("[SVA] TLAST not seen on output! input port=%0d dest=%0d", i, s_tdest[i]);
+
 
         end
     endgenerate
