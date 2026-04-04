@@ -1,338 +1,345 @@
-// ============================================================
-// mini_router_full.v
-// Full RTL for EDA Playground (all modules in one file)
-// Hierarchy:
-//   mini_router_top
-//     sync_fifo x4
-//     route_ctrl
-//       arbiter_rr x2
-//     crossbar
-// ============================================================
-
-module arbiter_rr (
-    input       clk, rst_n,
-    input [3:0] req,
-    input       tready,
-    input       tlast,
-    output reg [3:0] grant
-);
-    reg [1:0] last_grant;
-    reg [3:0] curr_grant;
-
-    // Combinational logic: determine grant based on req and last_grant
-    always @(*) begin
-        curr_grant = 4'b0000;
-
-            case (last_grant)
-                2'd0 : begin
-                    if      (req[1]) curr_grant = 4'b0010;
-                    else if (req[2]) curr_grant = 4'b0100;
-                    else if (req[3]) curr_grant = 4'b1000;
-                    else if (req[0]) curr_grant = 4'b0001;
-                end
-                2'd1 : begin
-                    if      (req[2]) curr_grant = 4'b0100;
-                    else if (req[3]) curr_grant = 4'b1000;
-                    else if (req[0]) curr_grant = 4'b0001;
-                    else if (req[1]) curr_grant = 4'b0010;
-                end
-                2'd2 : begin
-                    if      (req[3]) curr_grant = 4'b1000;
-                    else if (req[0]) curr_grant = 4'b0001;
-                    else if (req[1]) curr_grant = 4'b0010;
-                    else if (req[2]) curr_grant = 4'b0100;
-                end
-                2'd3 : begin
-                    if      (req[0]) curr_grant = 4'b0001;
-                    else if (req[1]) curr_grant = 4'b0010;
-                    else if (req[2]) curr_grant = 4'b0100;
-                    else if (req[3]) curr_grant = 4'b1000;
-                end
-            endcase
-    end
-
-    // Sequential logic: update last_grant on grant completion
-    always @ (posedge clk) begin
-        if (!rst_n) begin
-            last_grant <= 0;
-        end
-        else begin
-            if (|curr_grant && tlast && tready) begin
-                case (curr_grant) 
-                    4'b0001 : last_grant <= 0;
-                    4'b0010 : last_grant <= 1;
-                    4'b0100 : last_grant <= 2;
-                    4'b1000 : last_grant <= 3;
-                endcase
-            end
-        end
-    end
-
-    // Grant register: latch curr_grant when downstream is ready
-    // tready=1 : update grant with new arbitration result
-    // tready=0 : hold current grant (stall)
-    always @ (posedge clk) begin
-        if(!rst_n) begin
-            grant <= 0;
-        end
-        else begin
-            if(tready) begin
-                grant <= curr_grant;
-            end
-        end
-    end
-
-endmodule
+// =============================================================
+// mini_router_all.v
+// EDA Playground용 통합 파일
+// 모듈 순서: sync_fifo → arbiter_rr → route_ctrl → crossbar → mini_router_top
+// packed format: {tdata[D_WIDTH+3:4], tid[3:2], tdest[1], tlast[0]}
+// =============================================================
 
 
-module sync_fifo #(parameter DEPTH=8, D_WIDTH=8)(
+// =============================================================
+// sync_fifo (FWFT: combinational output)
+// =============================================================
+module sync_fifo #(parameter DEPTH=4, D_WIDTH=8)(
     input                   clk,
     input                   rst_n,
     input                   wr_en,
     input                   rd_en,
-    input       [D_WIDTH-1:0] din,
-    output reg  [D_WIDTH-1:0] dout,
+    input  [D_WIDTH-1:0]    tdata_in,
+    output [D_WIDTH-1:0]    tdata_out,  // FWFT: combinational
     output                  full,
     output                  empty
 );
     localparam P_INDEX = $clog2(DEPTH);
 
     reg [D_WIDTH-1:0] fifo [0:DEPTH-1];
-    reg [P_INDEX:0] wptr;
-    reg [P_INDEX:0] rptr;
+    reg [P_INDEX:0]   wptr;
+    reg [P_INDEX:0]   rptr;
 
-    always @ (posedge clk) begin
-        if(!rst_n) begin
+    // write
+    always @(posedge clk) begin
+        if (!rst_n) begin
             wptr <= 0;
-        end
-        else begin
+        end else begin
             if (wr_en && !full) begin
-                fifo[wptr[P_INDEX-1:0]] <= din;
+                fifo[wptr[P_INDEX-1:0]] <= tdata_in;
                 wptr <= wptr + 1'b1;
             end
         end
     end
 
-    always @ (posedge clk) begin
-        if(!rst_n) begin
+    // read: rptr만 업데이트
+    always @(posedge clk) begin
+        if (!rst_n) begin
             rptr <= 0;
-            dout <= 0;
-        end
-        else begin
-            if(rd_en && !empty) begin
-                dout <= fifo[rptr[P_INDEX-1:0]];
+        end else begin
+            if (rd_en && !empty) begin
                 rptr <= rptr + 1'b1;
             end
         end
     end
 
-    assign empty = (wptr == rptr);
-    assign full  = (wptr[P_INDEX-1:0] == rptr[P_INDEX-1:0]) && (wptr[P_INDEX] != rptr[P_INDEX]);
+    // FWFT combinational output
+    assign tdata_out = fifo[rptr[P_INDEX-1:0]];
+    assign empty     = (wptr == rptr);
+    assign full      = (wptr[P_INDEX-1:0] == rptr[P_INDEX-1:0]) &&
+                       (wptr[P_INDEX] != rptr[P_INDEX]);
 
 endmodule
 
 
-module route_ctrl(
+// =============================================================
+// arbiter_rr (round-robin, one-hot grant)
+// fix: case(grant) 직접 참조, req 없을 때 grant=0 리셋
+// =============================================================
+module arbiter_rr (
+    input           clk,
+    input           rst_n,
+    input  [3:0]    req,
+    input           ready,
+    input           last,
+    output reg [3:0] grant
+);
+
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            grant <= 4'b0000;
+        end else begin
+            // 첫 번째 req 도착
+            if ((grant == 4'b0000) && |req) begin
+                if      (req[0]) grant <= 4'b0001;
+                else if (req[1]) grant <= 4'b0010;
+                else if (req[2]) grant <= 4'b0100;
+                else if (req[3]) grant <= 4'b1000;
+                else             grant <= 4'b0000;
+
+            // 패킷 끝: round-robin으로 next grant 선택
+            end else if (ready && last) begin
+                case (grant)  // last_grant 대신 grant 직접 참조 (NB 타이밍 문제 방지)
+                    4'b0001: begin
+                        if      (req[1]) grant <= 4'b0010;
+                        else if (req[2]) grant <= 4'b0100;
+                        else if (req[3]) grant <= 4'b1000;
+                        //else if (req[0]) grant <= 4'b0001;
+                        else             grant <= 4'b0000;
+                    end
+                    4'b0010: begin
+                        if      (req[2]) grant <= 4'b0100;
+                        else if (req[3]) grant <= 4'b1000;
+                        else if (req[0]) grant <= 4'b0001;
+                        //else if (req[1]) grant <= 4'b0010;
+                        else             grant <= 4'b0000;
+                    end
+                    4'b0100: begin
+                        if      (req[3]) grant <= 4'b1000;
+                        else if (req[0]) grant <= 4'b0001;
+                        else if (req[1]) grant <= 4'b0010;
+                        //else if (req[2]) grant <= 4'b0100;
+                        else             grant <= 4'b0000;
+                    end
+                    4'b1000: begin
+                        if      (req[0]) grant <= 4'b0001;
+                        else if (req[1]) grant <= 4'b0010;
+                        else if (req[2]) grant <= 4'b0100;
+                        //else if (req[3]) grant <= 4'b1000;
+                        else             grant <= 4'b0000;
+                    end
+                    default: grant <= 4'b0000;
+                endcase
+            end
+        end
+    end
+
+endmodule
+
+
+// =============================================================
+// route_ctrl
+// =============================================================
+module route_ctrl (
     input       clk,
     input       rst_n,
-    input [3:0] tvalid,
-    input [3:0] tdest,
-    input [3:0] tlast,
-    input [1:0] tready,
-    output [3:0] grant0,
-    output [3:0] grant1
+
+    input       valid_0, valid_1, valid_2, valid_3,
+    input       dest_0,  dest_1,  dest_2,  dest_3,
+    input       last_0,  last_1,
+    input       ready_0, ready_1,
+
+    output [3:0] grant_0,
+    output [3:0] grant_1
 );
-    wire [3:0] req0;
-    wire [3:0] req1;
-    wire tlast0, tlast1;
-    wire [3:0] grant0_w, grant1_w;
+    wire [3:0] req_0, req_1;
 
-    assign req0[0] = tvalid[0] && (tdest[0] == 1'b0);
-    assign req0[1] = tvalid[1] && (tdest[1] == 1'b0);
-    assign req0[2] = tvalid[2] && (tdest[2] == 1'b0);
-    assign req0[3] = tvalid[3] && (tdest[3] == 1'b0);
+    assign req_0[0] = valid_0 && (dest_0 == 1'b0);
+    assign req_0[1] = valid_1 && (dest_1 == 1'b0);
+    assign req_0[2] = valid_2 && (dest_2 == 1'b0);
+    assign req_0[3] = valid_3 && (dest_3 == 1'b0);
 
-    assign req1[0] = tvalid[0] && (tdest[0] == 1'b1);
-    assign req1[1] = tvalid[1] && (tdest[1] == 1'b1);
-    assign req1[2] = tvalid[2] && (tdest[2] == 1'b1);
-    assign req1[3] = tvalid[3] && (tdest[3] == 1'b1);
-
-    assign tlast0 = (grant0_w == 4'b0001) ? tlast[0] :
-                    (grant0_w == 4'b0010) ? tlast[1] :
-                    (grant0_w == 4'b0100) ? tlast[2] :
-                    (grant0_w == 4'b1000) ? tlast[3] : 1'b0;
-
-    assign tlast1 = (grant1_w == 4'b0001) ? tlast[0] :
-                    (grant1_w == 4'b0010) ? tlast[1] :
-                    (grant1_w == 4'b0100) ? tlast[2] :
-                    (grant1_w == 4'b1000) ? tlast[3] : 1'b0;
-
-    assign grant0 = grant0_w;
-    assign grant1 = grant1_w;
+    assign req_1[0] = valid_0 && (dest_0 == 1'b1);
+    assign req_1[1] = valid_1 && (dest_1 == 1'b1);
+    assign req_1[2] = valid_2 && (dest_2 == 1'b1);
+    assign req_1[3] = valid_3 && (dest_3 == 1'b1);
 
     arbiter_rr u0 (
-        .clk(clk),
-        .rst_n(rst_n),
-        .req(req0),
-        .tlast(tlast0),
-        .grant(grant0_w),
-        .tready(tready[0])
+        .clk(clk), .rst_n(rst_n),
+        .req(req_0), .ready(ready_0), .last(last_0),
+        .grant(grant_0)
     );
 
     arbiter_rr u1 (
-        .clk(clk),
-        .rst_n(rst_n),
-        .req(req1),
-        .tlast(tlast1),
-        .grant(grant1_w),
-        .tready(tready[1])
+        .clk(clk), .rst_n(rst_n),
+        .req(req_1), .ready(ready_1), .last(last_1),
+        .grant(grant_1)
     );
 
 endmodule
 
 
-module crossbar #(parameter D_WIDTH=8)(
-    input  [3:0]             tvalid,
-    input  [3:0]             tlast,
-    input  [3:0]             grant0,
-    input  [3:0]             grant1,
-    input  [(D_WIDTH*4)-1:0] tdata_in, // [7:0]=port0,[15:8]=port1,[23:16]=port2,[31:24]=port3
-    output                   tvalid0,
-    output                   tlast0,
-    output [D_WIDTH-1:0]     tdata0,
-    output                   tvalid1,
-    output                   tlast1,
-    output [D_WIDTH-1:0]     tdata1
+// =============================================================
+// crossbar (pure combinational)
+// =============================================================
+module crossbar #(
+    parameter D_WIDTH    = 8,
+    parameter FIFO_WIDTH = D_WIDTH + 4
+)(
+    input  [3:0]            grant_0,  grant_1,
+    input  [FIFO_WIDTH-1:0] data_in_0, data_in_1, data_in_2, data_in_3,
+    input                   s_valid_0, s_valid_1, s_valid_2, s_valid_3,
+
+    output [D_WIDTH-1:0]    m_tdata_0, m_tdata_1,
+    output [1:0]            m_tid_0,   m_tid_1,
+    output                  m_valid_0, m_valid_1,
+    output                  m_dest_0,  m_dest_1,
+    output                  m_last_0,  m_last_1
 );
-    assign tdata0 = (grant0 == 4'b0001) ? tdata_in[7:0]   :
-                    (grant0 == 4'b0010) ? tdata_in[15:8]  :
-                    (grant0 == 4'b0100) ? tdata_in[23:16] :
-                    (grant0 == 4'b1000) ? tdata_in[31:24] : {D_WIDTH{1'b0}};
+    // tdata: [FIFO_WIDTH-1:4]
+    assign m_tdata_0 = (grant_0 == 4'b0001) ? data_in_0[FIFO_WIDTH-1:4] :
+                       (grant_0 == 4'b0010) ? data_in_1[FIFO_WIDTH-1:4] :
+                       (grant_0 == 4'b0100) ? data_in_2[FIFO_WIDTH-1:4] :
+                       (grant_0 == 4'b1000) ? data_in_3[FIFO_WIDTH-1:4] :
+                       {D_WIDTH{1'b0}};
 
-    assign tdata1 = (grant1 == 4'b0001) ? tdata_in[7:0]   :
-                    (grant1 == 4'b0010) ? tdata_in[15:8]  :
-                    (grant1 == 4'b0100) ? tdata_in[23:16] :
-                    (grant1 == 4'b1000) ? tdata_in[31:24] : {D_WIDTH{1'b0}};
+    assign m_tdata_1 = (grant_1 == 4'b0001) ? data_in_0[FIFO_WIDTH-1:4] :
+                       (grant_1 == 4'b0010) ? data_in_1[FIFO_WIDTH-1:4] :
+                       (grant_1 == 4'b0100) ? data_in_2[FIFO_WIDTH-1:4] :
+                       (grant_1 == 4'b1000) ? data_in_3[FIFO_WIDTH-1:4] :
+                       {D_WIDTH{1'b0}};
 
-    assign tvalid0 = (grant0 == 4'b0001) ? tvalid[0] :
-                     (grant0 == 4'b0010) ? tvalid[1] :
-                     (grant0 == 4'b0100) ? tvalid[2] :
-                     (grant0 == 4'b1000) ? tvalid[3] : 1'b0;
+    // tlast: [0]
+    assign m_last_0 = (grant_0 == 4'b0001) ? data_in_0[0] :
+                      (grant_0 == 4'b0010) ? data_in_1[0] :
+                      (grant_0 == 4'b0100) ? data_in_2[0] :
+                      (grant_0 == 4'b1000) ? data_in_3[0] : 1'b0;
 
-    assign tvalid1 = (grant1 == 4'b0001) ? tvalid[0] :
-                     (grant1 == 4'b0010) ? tvalid[1] :
-                     (grant1 == 4'b0100) ? tvalid[2] :
-                     (grant1 == 4'b1000) ? tvalid[3] : 1'b0;
+    assign m_last_1 = (grant_1 == 4'b0001) ? data_in_0[0] :
+                      (grant_1 == 4'b0010) ? data_in_1[0] :
+                      (grant_1 == 4'b0100) ? data_in_2[0] :
+                      (grant_1 == 4'b1000) ? data_in_3[0] : 1'b0;
 
-    assign tlast0  = (grant0 == 4'b0001) ? tlast[0] :
-                     (grant0 == 4'b0010) ? tlast[1] :
-                     (grant0 == 4'b0100) ? tlast[2] :
-                     (grant0 == 4'b1000) ? tlast[3] : 1'b0;
+    // tdest: [1]
+    assign m_dest_0 = (grant_0 == 4'b0001) ? data_in_0[1] :
+                      (grant_0 == 4'b0010) ? data_in_1[1] :
+                      (grant_0 == 4'b0100) ? data_in_2[1] :
+                      (grant_0 == 4'b1000) ? data_in_3[1] : 1'b0;
 
-    assign tlast1  = (grant1 == 4'b0001) ? tlast[0] :
-                     (grant1 == 4'b0010) ? tlast[1] :
-                     (grant1 == 4'b0100) ? tlast[2] :
-                     (grant1 == 4'b1000) ? tlast[3] : 1'b0;
+    assign m_dest_1 = (grant_1 == 4'b0001) ? data_in_0[1] :
+                      (grant_1 == 4'b0010) ? data_in_1[1] :
+                      (grant_1 == 4'b0100) ? data_in_2[1] :
+                      (grant_1 == 4'b1000) ? data_in_3[1] : 1'b0;
+
+    // tid: [3:2]
+    assign m_tid_0 = (grant_0 == 4'b0001) ? data_in_0[3:2] :
+                     (grant_0 == 4'b0010) ? data_in_1[3:2] :
+                     (grant_0 == 4'b0100) ? data_in_2[3:2] :
+                     (grant_0 == 4'b1000) ? data_in_3[3:2] : 2'b00;
+
+    assign m_tid_1 = (grant_1 == 4'b0001) ? data_in_0[3:2] :
+                     (grant_1 == 4'b0010) ? data_in_1[3:2] :
+                     (grant_1 == 4'b0100) ? data_in_2[3:2] :
+                     (grant_1 == 4'b1000) ? data_in_3[3:2] : 2'b00;
+
+    // valid
+    assign m_valid_0 = (grant_0 == 4'b0001) ? s_valid_0 :
+                       (grant_0 == 4'b0010) ? s_valid_1 :
+                       (grant_0 == 4'b0100) ? s_valid_2 :
+                       (grant_0 == 4'b1000) ? s_valid_3 : 1'b0;
+
+    assign m_valid_1 = (grant_1 == 4'b0001) ? s_valid_0 :
+                       (grant_1 == 4'b0010) ? s_valid_1 :
+                       (grant_1 == 4'b0100) ? s_valid_2 :
+                       (grant_1 == 4'b1000) ? s_valid_3 : 1'b0;
 
 endmodule
 
 
+// =============================================================
+// mini_router_top
+// 4-input × 2-output AXI-Stream NoC Router
+// =============================================================
 module mini_router_top #(
-    parameter D_WIDTH = 8,
-    parameter DEPTH   = 4
+    parameter D_WIDTH    = 8,
+    parameter FIFO_DEPTH = 4,
+    parameter FIFO_WIDTH = D_WIDTH + 4  // {tdata(8), tid(2), tdest(1), tlast(1)}
 )(
     input                   clk,
     input                   rst_n,
 
-    // Slave side (upstream -> mini_router)
-    input  [D_WIDTH-1:0]    s_tdata_0,
-    input  [D_WIDTH-1:0]    s_tdata_1,
-    input  [D_WIDTH-1:0]    s_tdata_2,
-    input  [D_WIDTH-1:0]    s_tdata_3,
-    input  [3:0]            s_tvalid,
-    input  [3:0]            s_tlast,
-    input  [3:0]            s_tdest,
-    output [3:0]            s_tready,
+    // Slave side (input ports 0~3)
+    input  [D_WIDTH-1:0]    s_tdata_0,  s_tdata_1,  s_tdata_2,  s_tdata_3,
+    input  [1:0]            s_tid_0,    s_tid_1,    s_tid_2,    s_tid_3,
+    input                   s_tdest_0,  s_tdest_1,  s_tdest_2,  s_tdest_3,
+    input                   s_tlast_0,  s_tlast_1,  s_tlast_2,  s_tlast_3,
+    input                   s_tvalid_0, s_tvalid_1, s_tvalid_2, s_tvalid_3,
+    output                  s_tready_0, s_tready_1, s_tready_2, s_tready_3,
 
-    // Master side (mini_router -> downstream)
-    output [D_WIDTH-1:0]    m_tdata_0,
-    output [D_WIDTH-1:0]    m_tdata_1,
-    output [1:0]            m_tvalid,
-    output [1:0]            m_tlast,
-    input  [1:0]            m_tready
+    // Master side (output ports 0~1)
+    input                   m_tready_0, m_tready_1,
+    output [D_WIDTH-1:0]    m_tdata_0,  m_tdata_1,
+    output [1:0]            m_tid_0,    m_tid_1,
+    output                  m_tlast_0,  m_tlast_1,
+    output                  m_tvalid_0, m_tvalid_1
 );
 
-    // sync_fifo
-    wire [3:0] fifo_full;
-    wire [3:0] fifo_empty;
-    wire [3:0] wr__s_tvalid;
-    assign wr__s_tvalid = s_tvalid & ~fifo_full;
-    assign s_tready     = ~fifo_full;
+    wire [FIFO_WIDTH-1:0] fifo_din_0,  fifo_din_1,  fifo_din_2,  fifo_din_3;
+    wire [FIFO_WIDTH-1:0] fifo_dout_0, fifo_dout_1, fifo_dout_2, fifo_dout_3;
+    wire fifo_full_0,  fifo_full_1,  fifo_full_2,  fifo_full_3;
+    wire fifo_empty_0, fifo_empty_1, fifo_empty_2, fifo_empty_3;
+    wire [3:0] grant_0, grant_1;
+    wire fifo_rd_en_0, fifo_rd_en_1, fifo_rd_en_2, fifo_rd_en_3;
 
-    // route_ctrl
-    wire [3:0] grant0_o;
-    wire [3:0] grant1_o;
-    wire [3:0] fifo_rd_en;
-    assign fifo_rd_en = grant0_o | grant1_o;
+    // Pack: {tdata, tid, tdest, tlast}
+    assign fifo_din_0 = {s_tdata_0, s_tid_0, s_tdest_0, s_tlast_0};
+    assign fifo_din_1 = {s_tdata_1, s_tid_1, s_tdest_1, s_tlast_1};
+    assign fifo_din_2 = {s_tdata_2, s_tid_2, s_tdest_2, s_tlast_2};
+    assign fifo_din_3 = {s_tdata_3, s_tid_3, s_tdest_3, s_tlast_3};
 
-    // crossbar input bus
-    wire [D_WIDTH-1:0]     data_to_data_0;
-    wire [D_WIDTH-1:0]     data_to_data_1;
-    wire [D_WIDTH-1:0]     data_to_data_2;
-    wire [D_WIDTH-1:0]     data_to_data_3;
-    wire [(D_WIDTH*4)-1:0] data_to_data;
-    assign data_to_data = {data_to_data_3, data_to_data_2, data_to_data_1, data_to_data_0};
+    // s_tready = ~fifo_full
+    assign s_tready_0 = ~fifo_full_0;
+    assign s_tready_1 = ~fifo_full_1;
+    assign s_tready_2 = ~fifo_full_2;
+    assign s_tready_3 = ~fifo_full_3;
 
-    sync_fifo #(.D_WIDTH(D_WIDTH), .DEPTH(DEPTH)) u_fifo_0 (
+    // rd_en: grant된 port && downstream ready (beat 단위)
+    assign fifo_rd_en_0 = (grant_0[0] && m_tready_0) || (grant_1[0] && m_tready_1);
+    assign fifo_rd_en_1 = (grant_0[1] && m_tready_0) || (grant_1[1] && m_tready_1);
+    assign fifo_rd_en_2 = (grant_0[2] && m_tready_0) || (grant_1[2] && m_tready_1);
+    assign fifo_rd_en_3 = (grant_0[3] && m_tready_0) || (grant_1[3] && m_tready_1);
+
+    sync_fifo #(.DEPTH(FIFO_DEPTH), .D_WIDTH(FIFO_WIDTH)) u_fifo_0 (
         .clk(clk), .rst_n(rst_n),
-        .wr_en(wr__s_tvalid[0]), .rd_en(fifo_rd_en[0]),
-        .din(s_tdata_0), .dout(data_to_data_0),
-        .full(fifo_full[0]), .empty(fifo_empty[0])
+        .wr_en(s_tvalid_0 & s_tready_0), .rd_en(fifo_rd_en_0),
+        .tdata_in(fifo_din_0), .tdata_out(fifo_dout_0),
+        .full(fifo_full_0), .empty(fifo_empty_0)
     );
-
-    sync_fifo #(.D_WIDTH(D_WIDTH), .DEPTH(DEPTH)) u_fifo_1 (
+    sync_fifo #(.DEPTH(FIFO_DEPTH), .D_WIDTH(FIFO_WIDTH)) u_fifo_1 (
         .clk(clk), .rst_n(rst_n),
-        .wr_en(wr__s_tvalid[1]), .rd_en(fifo_rd_en[1]),
-        .din(s_tdata_1), .dout(data_to_data_1),
-        .full(fifo_full[1]), .empty(fifo_empty[1])
+        .wr_en(s_tvalid_1 & s_tready_1), .rd_en(fifo_rd_en_1),
+        .tdata_in(fifo_din_1), .tdata_out(fifo_dout_1),
+        .full(fifo_full_1), .empty(fifo_empty_1)
     );
-
-    sync_fifo #(.D_WIDTH(D_WIDTH), .DEPTH(DEPTH)) u_fifo_2 (
+    sync_fifo #(.DEPTH(FIFO_DEPTH), .D_WIDTH(FIFO_WIDTH)) u_fifo_2 (
         .clk(clk), .rst_n(rst_n),
-        .wr_en(wr__s_tvalid[2]), .rd_en(fifo_rd_en[2]),
-        .din(s_tdata_2), .dout(data_to_data_2),
-        .full(fifo_full[2]), .empty(fifo_empty[2])
+        .wr_en(s_tvalid_2 & s_tready_2), .rd_en(fifo_rd_en_2),
+        .tdata_in(fifo_din_2), .tdata_out(fifo_dout_2),
+        .full(fifo_full_2), .empty(fifo_empty_2)
     );
-
-    sync_fifo #(.D_WIDTH(D_WIDTH), .DEPTH(DEPTH)) u_fifo_3 (
+    sync_fifo #(.DEPTH(FIFO_DEPTH), .D_WIDTH(FIFO_WIDTH)) u_fifo_3 (
         .clk(clk), .rst_n(rst_n),
-        .wr_en(wr__s_tvalid[3]), .rd_en(fifo_rd_en[3]),
-        .din(s_tdata_3), .dout(data_to_data_3),
-        .full(fifo_full[3]), .empty(fifo_empty[3])
+        .wr_en(s_tvalid_3 & s_tready_3), .rd_en(fifo_rd_en_3),
+        .tdata_in(fifo_din_3), .tdata_out(fifo_dout_3),
+        .full(fifo_full_3), .empty(fifo_empty_3)
     );
 
     route_ctrl u_route_ctrl (
         .clk(clk), .rst_n(rst_n),
-        .tvalid(~fifo_empty),
-        .tdest(s_tdest),
-        .tlast(s_tlast),
-        .tready(m_tready),
-        .grant0(grant0_o),
-        .grant1(grant1_o)
+        .valid_0(~fifo_empty_0), .valid_1(~fifo_empty_1),
+        .valid_2(~fifo_empty_2), .valid_3(~fifo_empty_3),
+        .dest_0(fifo_dout_0[1]), .dest_1(fifo_dout_1[1]),
+        .dest_2(fifo_dout_2[1]), .dest_3(fifo_dout_3[1]),
+        .last_0(m_tlast_0),  .last_1(m_tlast_1),
+        .ready_0(m_tready_0), .ready_1(m_tready_1),
+        .grant_0(grant_0), .grant_1(grant_1)
     );
 
-    crossbar #(.D_WIDTH(D_WIDTH)) u_crossbar (
-        .tvalid(~fifo_empty),
-        .tlast(s_tlast),
-        .grant0(grant0_o),
-        .grant1(grant1_o),
-        .tdata_in(data_to_data),
-        .tvalid0(m_tvalid[0]),
-        .tlast0(m_tlast[0]),
-        .tdata0(m_tdata_0),
-        .tvalid1(m_tvalid[1]),
-        .tlast1(m_tlast[1]),
-        .tdata1(m_tdata_1)
+    crossbar #(.D_WIDTH(D_WIDTH), .FIFO_WIDTH(FIFO_WIDTH)) u_crossbar (
+        .grant_0(grant_0),       .grant_1(grant_1),
+        .data_in_0(fifo_dout_0), .data_in_1(fifo_dout_1),
+        .data_in_2(fifo_dout_2), .data_in_3(fifo_dout_3),
+        .s_valid_0(~fifo_empty_0), .s_valid_1(~fifo_empty_1),
+        .s_valid_2(~fifo_empty_2), .s_valid_3(~fifo_empty_3),
+        .m_tdata_0(m_tdata_0),  .m_tdata_1(m_tdata_1),
+        .m_tid_0(m_tid_0),      .m_tid_1(m_tid_1),
+        .m_valid_0(m_tvalid_0), .m_valid_1(m_tvalid_1),
+        .m_last_0(m_tlast_0),   .m_last_1(m_tlast_1)
     );
 
 endmodule
