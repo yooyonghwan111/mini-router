@@ -2,7 +2,7 @@
 import uvm_pkg::*;
 
 `include "interface.sv"
-//`include "sva.sv"         
+`include "sva.sv"         
 `include "seq_item.sv"
 `include "sequencer.sv"
 `include "seq.sv"
