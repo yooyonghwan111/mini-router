@@ -49,7 +49,7 @@ class router_input_monitor extends uvm_monitor;
 
 
                 pkt_buf_0.delete();              // 버퍼 초기화 (새로운 packet을 담기위함)
-                `uvm_info(get_type_name(), $sformatf("input port0 packet done: tid=%0b dest=%0b beats=%0d", data_obj.s_tid, data_obj.s_tdest, data_obj.s_pkt_data.size()), UVM_LOW)
+                `uvm_info(get_type_name(), $sformatf("input port0 packet done: tid=%0b dest=%0b beats=%0d", data_obj.s_tid, data_obj.s_tdest, data_obj.s_pkt_data.size()), UVM_HIGH)
 
                 ap_mon.write(data_obj); // scoreboard로 캡쳐한 값들 넘김
               end
@@ -76,7 +76,7 @@ class router_input_monitor extends uvm_monitor;
 
                 pkt_buf_1.delete();              // 버퍼 초기화 (새로운 packet을 담기위함)
 
-                `uvm_info(get_type_name(), $sformatf("input port1 packet done: tid=%0b dest=%0b beats=%0d", data_obj.s_tid, data_obj.s_tdest, data_obj.s_pkt_data.size()), UVM_LOW)
+                `uvm_info(get_type_name(), $sformatf("input port1 packet done: tid=%0b dest=%0b beats=%0d", data_obj.s_tid, data_obj.s_tdest, data_obj.s_pkt_data.size()), UVM_HIGH)
 
                 ap_mon.write(data_obj); // scoreboard로 캡쳐한 값들 넘김
               end
@@ -103,7 +103,7 @@ class router_input_monitor extends uvm_monitor;
 
                 pkt_buf_2.delete();              // 버퍼 초기화 (새로운 packet을 담기위함)
 
-                `uvm_info(get_type_name(), $sformatf("input port2 packet done: tid=%0b dest=%0b beats=%0d", data_obj.s_tid, data_obj.s_tdest, data_obj.s_pkt_data.size()), UVM_LOW)
+                `uvm_info(get_type_name(), $sformatf("input port2 packet done: tid=%0b dest=%0b beats=%0d", data_obj.s_tid, data_obj.s_tdest, data_obj.s_pkt_data.size()), UVM_HIGH)
 
                 ap_mon.write(data_obj); // scoreboard로 캡쳐한 값들 넘김                
 
@@ -133,7 +133,7 @@ class router_input_monitor extends uvm_monitor;
 
                 pkt_buf_3.delete();              // 버퍼 초기화 (새로운 packet을 담기위함)
 
-                `uvm_info(get_type_name(), $sformatf("input port3 packet done: tid=%0b dest=%0b beats=%0d", data_obj.s_tid, data_obj.s_tdest, data_obj.s_pkt_data.size()), UVM_LOW)
+                `uvm_info(get_type_name(), $sformatf("input port3 packet done: tid=%0b dest=%0b beats=%0d", data_obj.s_tid, data_obj.s_tdest, data_obj.s_pkt_data.size()), UVM_HIGH)
 
                 ap_mon.write(data_obj); // scoreboard로 캡쳐한 값들 넘김
 

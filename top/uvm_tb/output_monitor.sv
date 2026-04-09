@@ -45,7 +45,7 @@ class router_output_monitor extends uvm_monitor;
                 data_obj.m_pkt_data = pkt_buf_0;
 
                 pkt_buf_0.delete();              // 버퍼 초기화 (새로운 packet을 담기위함)
-                `uvm_info(get_type_name(), $sformatf("output port0 packet done: tid=%0b beats=%0d", data_obj.m_tid, data_obj.m_pkt_data.size()), UVM_LOW)
+                `uvm_info(get_type_name(), $sformatf("output port0 packet done: tid=%0b beats=%0d", data_obj.m_tid, data_obj.m_pkt_data.size()), UVM_HIGH)
 
                 ap_mon.write(data_obj); // scoreboard로 캡쳐한 값들 넘김
               end
@@ -70,7 +70,7 @@ class router_output_monitor extends uvm_monitor;
                 data_obj.m_pkt_data = pkt_buf_1;
 
                 pkt_buf_1.delete();              // 버퍼 초기화 (새로운 packet을 담기위함)
-                `uvm_info(get_type_name(), $sformatf("output port1 packet done: tid=%0b beats=%0d", data_obj.m_tid, data_obj.m_pkt_data.size()), UVM_LOW)
+                `uvm_info(get_type_name(), $sformatf("output port1 packet done: tid=%0b beats=%0d", data_obj.m_tid, data_obj.m_pkt_data.size()), UVM_HIGH)
 
                 ap_mon.write(data_obj); // scoreboard로 캡쳐한 값들 넘김
               end
