@@ -159,7 +159,7 @@ FIFO word = {tdata[D_WIDTH-1:0], tid[1:0], tdest[0], tlast[0]}
 - **[REQ-BP-01]** The router shall deassert `s_tready[n]` when the corresponding input FIFO is full.
 - **[REQ-BP-02]** No data shall be lost when `s_tready=0` (upstream backpressure).
 - **[REQ-BP-03]** The router shall hold the current grant when `m_tready=0` (downstream backpressure).
-- **[REQ-BP-04]** The arbiter shall not update `last_grant` while `m_tready=0`.
+- **[REQ-BP-04]** The arbiter shall not update `grant` while `m_tready=0`.
 - **[REQ-BP-05]** The router shall resume normal operation after `m_tready` is reasserted.
 
 ### 8.3 Contention
