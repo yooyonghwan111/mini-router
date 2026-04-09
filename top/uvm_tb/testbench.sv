@@ -14,6 +14,7 @@ import uvm_pkg::*;
 `include "passive_agent.sv"
 `include "env.sv"
 //`include "scoreboard_sanity_test.sv"
-`include "normal_routing_test.sv"
+//`include "normal_routing_test.sv"
+`include "upstream_bp_test.sv"
 `include "tb_top.sv"
 

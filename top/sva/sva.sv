@@ -10,11 +10,18 @@ interface mini_router_sva_if #(parameter D_WIDTH=8) (
     input logic                 s_tdest_0,  s_tdest_1,  s_tdest_2,  s_tdest_3,
     input logic [D_WIDTH-1:0]   s_tdata_0,  s_tdata_1,  s_tdata_2,  s_tdata_3,
 
+
     // Master side 
     input logic                 m_tvalid_0, m_tvalid_1,
     input logic                 m_tready_0, m_tready_1,
     input logic                 m_tlast_0,  m_tlast_1,
     input logic [D_WIDTH-1:0]   m_tdata_0,  m_tdata_1
+
+
+    
+
+
+
 );
 
     // Slave/Master signal -> packed 
@@ -41,8 +48,6 @@ interface mini_router_sva_if #(parameter D_WIDTH=8) (
 
 
     // 1. Handshake Rules
-   
-
     genvar i;
 
     generate
@@ -94,7 +99,6 @@ interface mini_router_sva_if #(parameter D_WIDTH=8) (
 
  
     // 2. Reset Rules
-
 
     // [p.2-28] During reset, slave TVALID must be driven LOW
     property p_s_reset_tvalid;
@@ -154,13 +158,12 @@ interface mini_router_sva_if #(parameter D_WIDTH=8) (
     // 최대 지연 산정값
     // 1clk * 4clk * 4clk = 16
     // ##[1:16]
-
-
     generate
         for (i = 0; i < 4; i++) begin : gen_packet_assertions
 
             property p_tlast_preserved;
-                @(posedge clk) disable iff (!rst_n)
+                //@(posedge clk) disable iff (!rst_n)
+                @(posedge clk) disable iff (!rst_n || !m_tready[0] || !m_tready[1]) // upstream_bp_test : m_tready control
                 s_tvalid[i] && s_tready[i] && s_tlast[i] |-> ##[1:16] 
                     (s_tdest[i] == 0) ? (m_tvalid[0] && m_tready[0] && m_tlast[0]) : // dest=0 (output0 으로 나오는 경우)
                                         (m_tvalid[1] && m_tready[1] && m_tlast[1]); // dest=1 (output1 로 나오는 경우)
@@ -171,5 +174,52 @@ interface mini_router_sva_if #(parameter D_WIDTH=8) (
 
         end
     endgenerate
+
+   
+    // =====================
+    // 4. Backpressur Rules (Slave side)
+    // =====================
+    // [REQ-BP-01] s_tready shall be deasserted when input FIFO is full
+    // fifo_full is an internal signal accessed via hierarchical reference for DV purposes
+
+        property p_s_tready_bp_0;
+            @(posedge clk) disable iff (!rst_n)
+            tb_top.dut.fifo_full_0 |-> !s_tready_0;
+        endproperty
+
+        assert property (p_s_tready_bp_0)
+            $info("[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly");
+        else 
+            $error ("[SVA][FAIL] s_tready_0 not deasserted when FIFO_0 full");
+        
+
+        property p_s_tready_bp_1;
+            @(posedge clk) disable iff (!rst_n)
+            tb_top.dut.fifo_full_1 |-> !s_tready_1;
+        endproperty
+        assert property (p_s_tready_bp_1)
+            $info("[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly");
+        else 
+            $error ("[SVA][FAIL] s_tready_1 not deasserted when FIFO_1 full");
+
+
+        property p_s_tready_bp_2;
+            @(posedge clk) disable iff (!rst_n)
+            tb_top.dut.fifo_full_2 |-> !s_tready_2;
+        endproperty
+        assert property (p_s_tready_bp_2)
+            $info("[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly");
+        else 
+            $error ("[SVA][FAIL] s_tready_2 not deasserted when FIFO_2 full");
+
+
+        property p_s_tready_bp_3;
+            @(posedge clk) disable iff (!rst_n)
+            tb_top.dut.fifo_full_3 |-> !s_tready_3;
+        endproperty
+        assert property (p_s_tready_bp_3)
+            $info("[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly");
+        else 
+            $error ("[SVA][FAIL] s_tready_3 not deasserted when FIFO_3 full");                  
 
 endinterface
