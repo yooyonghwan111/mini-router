@@ -13,6 +13,7 @@ import uvm_pkg::*;
 `include "active_agent.sv"
 `include "passive_agent.sv"
 `include "env.sv"
-`include "router_basic_test.sv"
+//`include "scoreboard_sanity_test.sv"
+`include "normal_routing_test.sv"
 `include "tb_top.sv"
 

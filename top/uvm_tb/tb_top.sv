@@ -152,7 +152,7 @@ module tb_top;
 
     initial begin
         uvm_config_db #(virtual router_if #(.D_WIDTH(8)))::set(null, "uvm_test_top.*", "vif", dut_if1);
-        run_test("router_basic_test");
+        run_test("normal_routing_test");
     end
 
     initial begin
