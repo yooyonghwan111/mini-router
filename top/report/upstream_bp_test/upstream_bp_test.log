@@ -1,0 +1,211 @@
+xrun: 25.03-s001: (c) Copyright 1995-2025 Cadence Design Systems, Inc.
+TOOL:	xrun	25.03-s001: Started on Apr 09, 2026 at 08:44:22 EDT
+xrun
+	-Q
+	-unbuffered
+	-timescale 1ns/1ns
+	-sysv
+	-access +rw
+	+UVM_VERBOSITY=UVM_MEDIUM
+	-uvmnocdnsextra
+	-uvmhome /xcelium25.03/tools//methodology/UVM/CDNS-1.2/sv
+	/xcelium25.03/tools//methodology/UVM/CDNS-1.2/sv/src/uvm_macros.svh
+	design.sv
+	testbench.sv
+
+   User defined plus("+") options:
+	+UVM_VERBOSITY=UVM_MEDIUM
+
+    crossbar #(.D_WIDTH(D_WIDTH), .FIFO_WIDTH(FIFO_WIDTH)) u_crossbar (
+                                                                    |
+xmelab: *W,CUVWSP (./design.sv,333|68): 2 output ports were not connected:
+xmelab: (./design.sv,181): m_dest_0
+xmelab: (./design.sv,181): m_dest_1
+
+	Top level design units:
+		uvm_pkg
+		$unit_0x67f934e9
+		tb_top
+Loading snapshot worklib.tb_top:sv .................... Done
+SVSEED default: 1
+xcelium> source /xcelium25.03/tools/xcelium/files/xmsimrc
+xcelium> source /xcelium25.03/tools//methodology/UVM/CDNS-1.2/sv/files/tcl/uvm_sim.tcl
+xcelium> run
+UVM_INFO /xcelium25.03/tools/methodology/UVM/CDNS-1.2/sv/src/base/uvm_root.svh(412) @ 0: reporter [UVM/RELNOTES] 
+----------------------------------------------------------------
+CDNS-UVM-1.2 (25.03-s001)
+(C) 2007-2014 Mentor Graphics Corporation
+(C) 2007-2014 Cadence Design Systems, Inc.
+(C) 2006-2014 Synopsys, Inc.
+(C) 2011-2013 Cypress Semiconductor Corp.
+(C) 2013-2014 NVIDIA Corporation
+----------------------------------------------------------------
+
+  ***********       IMPORTANT RELEASE NOTES         ************
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_NO_DEPRECATED undefined.
+  See http://www.eda.org/svdb/view.php?id=3313 for more details.
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_OBJECT_DO_NOT_NEED_CONSTRUCTOR undefined.
+  See http://www.eda.org/svdb/view.php?id=3770 for more details.
+
+      (Specify +UVM_NO_RELNOTES to turn off this notice)
+
+UVM_INFO @ 0: reporter [RNTST] Running test upstream_bp_test...
+UVM_INFO scoreboard.sv(44) @ 150: uvm_test_top.router_env.m_scb [router_scoreboard] input0 -> queue0: tid=0 beats=4 first=d7
+xmsim: *N,ASRTST (./sva.sv,191): (time 170 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 190 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 210 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 230 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+UVM_INFO scoreboard.sv(44) @ 250: uvm_test_top.router_env.m_scb [router_scoreboard] input1 -> queue0: tid=1 beats=4 first=5
+xmsim: *N,ASRTST (./sva.sv,191): (time 250 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 270 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 270 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 290 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 290 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 310 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 310 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 330 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 330 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+UVM_INFO scoreboard.sv(44) @ 350: uvm_test_top.router_env.m_scb [router_scoreboard] input2 -> queue0: tid=10 beats=4 first=5f
+xmsim: *N,ASRTST (./sva.sv,202): (time 350 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 350 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 370 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 370 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 370 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 390 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 390 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 390 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 410 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 410 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 410 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 430 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 430 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 430 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+UVM_INFO scoreboard.sv(44) @ 450: uvm_test_top.router_env.m_scb [router_scoreboard] input3 -> queue0: tid=11 beats=4 first=e7
+xmsim: *N,ASRTST (./sva.sv,212): (time 450 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 450 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 450 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,221): (time 470 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 470 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 470 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,191): (time 470 NS) Assertion tb_top.sva_if.p_s_tready_bp_0 has passed
+[SVA][PASS] FIFO_0 full -> s_tready_0 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,221): (time 490 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 490 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 490 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,221): (time 510 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 510 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 510 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+UVM_INFO scoreboard.sv(87) @ 530: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[0]: exp=d7 actual=d7
+UVM_INFO scoreboard.sv(87) @ 530: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[1]: exp=5b actual=5b
+UVM_INFO scoreboard.sv(87) @ 530: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[2]: exp=3d actual=3d
+UVM_INFO scoreboard.sv(87) @ 530: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[3]: exp=af actual=af
+xmsim: *N,ASRTST (./sva.sv,221): (time 530 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 530 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 530 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,221): (time 550 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 550 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,202): (time 550 NS) Assertion tb_top.sva_if.p_s_tready_bp_1 has passed
+[SVA][PASS] FIFO_1 full -> s_tready_1 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,221): (time 570 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 570 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,221): (time 590 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 590 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+UVM_INFO scoreboard.sv(87) @ 610: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[0]: exp=5 actual=5
+UVM_INFO scoreboard.sv(87) @ 610: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[1]: exp=82 actual=82
+UVM_INFO scoreboard.sv(87) @ 610: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[2]: exp=14 actual=14
+UVM_INFO scoreboard.sv(87) @ 610: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[3]: exp=b0 actual=b0
+xmsim: *N,ASRTST (./sva.sv,221): (time 610 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 610 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,221): (time 630 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,212): (time 630 NS) Assertion tb_top.sva_if.p_s_tready_bp_2 has passed
+[SVA][PASS] FIFO_2 full -> s_tready_2 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,221): (time 650 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,221): (time 670 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+UVM_INFO scoreboard.sv(87) @ 690: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[0]: exp=5f actual=5f
+UVM_INFO scoreboard.sv(87) @ 690: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[1]: exp=49 actual=49
+UVM_INFO scoreboard.sv(87) @ 690: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[2]: exp=96 actual=96
+UVM_INFO scoreboard.sv(87) @ 690: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[3]: exp=cf actual=cf
+xmsim: *N,ASRTST (./sva.sv,221): (time 690 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+xmsim: *N,ASRTST (./sva.sv,221): (time 710 NS) Assertion tb_top.sva_if.p_s_tready_bp_3 has passed
+[SVA][PASS] FIFO_3 full -> s_tready_3 deasserted correctly
+UVM_INFO scoreboard.sv(87) @ 770: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[0]: exp=e7 actual=e7
+UVM_INFO scoreboard.sv(87) @ 770: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[1]: exp=36 actual=36
+UVM_INFO scoreboard.sv(87) @ 770: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[2]: exp=ef actual=ef
+UVM_INFO scoreboard.sv(87) @ 770: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[3]: exp=ef actual=ef
+UVM_INFO /xcelium25.03/tools/methodology/UVM/CDNS-1.2/sv/src/base/uvm_objection.svh(1271) @ 2450: reporter [TEST_DONE] 'run' phase is ready to proceed to the 'extract' phase
+UVM_INFO /xcelium25.03/tools/methodology/UVM/CDNS-1.2/sv/src/base/uvm_report_server.svh(851) @ 2450: reporter [UVM/REPORT/SERVER] 
+--- UVM Report Summary ---
+
+** Report counts by severity
+UVM_INFO :   23
+UVM_WARNING :    0
+UVM_ERROR :    0
+UVM_FATAL :    0
+** Report counts by id
+[RNTST]     1
+[TEST_DONE]     1
+[UVM/RELNOTES]     1
+[router_scoreboard]    20
+
+Simulation complete via $finish(1) at time 2450 NS + 59
+/xcelium25.03/tools/methodology/UVM/CDNS-1.2/sv/src/base/uvm_root.svh:543     $finish;
+xcelium> exit
+TOOL:	xrun	25.03-s001: Exiting on Apr 09, 2026 at 08:44:30 EDT  (total: 00:00:08)
