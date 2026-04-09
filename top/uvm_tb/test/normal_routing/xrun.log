@@ -1,0 +1,105 @@
+xrun: 25.03-s001: (c) Copyright 1995-2025 Cadence Design Systems, Inc.
+TOOL:	xrun	25.03-s001: Started on Apr 09, 2026 at 04:15:34 EDT
+xrun
+	-Q
+	-unbuffered
+	-timescale 1ns/1ns
+	-sysv
+	-access +rw
+	+UVM_VERBOSITY=UVM_MEDIUM
+	-uvmnocdnsextra
+	-uvmhome /xcelium25.03/tools//methodology/UVM/CDNS-1.2/sv
+	/xcelium25.03/tools//methodology/UVM/CDNS-1.2/sv/src/uvm_macros.svh
+	design.sv
+	testbench.sv
+
+   User defined plus("+") options:
+	+UVM_VERBOSITY=UVM_MEDIUM
+
+    crossbar #(.D_WIDTH(D_WIDTH), .FIFO_WIDTH(FIFO_WIDTH)) u_crossbar (
+                                                                    |
+xmelab: *W,CUVWSP (./design.sv,333|68): 2 output ports were not connected:
+xmelab: (./design.sv,181): m_dest_0
+xmelab: (./design.sv,181): m_dest_1
+
+	Top level design units:
+		uvm_pkg
+		$unit_0x67f934e9
+		tb_top
+Loading snapshot worklib.tb_top:sv .................... Done
+SVSEED default: 1
+xcelium> source /xcelium25.03/tools/xcelium/files/xmsimrc
+xcelium> source /xcelium25.03/tools//methodology/UVM/CDNS-1.2/sv/files/tcl/uvm_sim.tcl
+xcelium> run
+UVM_INFO /xcelium25.03/tools/methodology/UVM/CDNS-1.2/sv/src/base/uvm_root.svh(412) @ 0: reporter [UVM/RELNOTES] 
+----------------------------------------------------------------
+CDNS-UVM-1.2 (25.03-s001)
+(C) 2007-2014 Mentor Graphics Corporation
+(C) 2007-2014 Cadence Design Systems, Inc.
+(C) 2006-2014 Synopsys, Inc.
+(C) 2011-2013 Cypress Semiconductor Corp.
+(C) 2013-2014 NVIDIA Corporation
+----------------------------------------------------------------
+
+  ***********       IMPORTANT RELEASE NOTES         ************
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_NO_DEPRECATED undefined.
+  See http://www.eda.org/svdb/view.php?id=3313 for more details.
+
+  You are using a version of the UVM library that has been compiled
+  with `UVM_OBJECT_DO_NOT_NEED_CONSTRUCTOR undefined.
+  See http://www.eda.org/svdb/view.php?id=3770 for more details.
+
+      (Specify +UVM_NO_RELNOTES to turn off this notice)
+
+UVM_INFO @ 0: reporter [RNTST] Running test normal_routing_test...
+UVM_INFO scoreboard.sv(44) @ 150: uvm_test_top.router_env.m_scb [router_scoreboard] input0 -> queue0: tid=0 beats=4 first=c1
+UVM_INFO scoreboard.sv(87) @ 190: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[0]: exp=c1 actual=c1
+UVM_INFO scoreboard.sv(87) @ 190: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[1]: exp=32 actual=32
+UVM_INFO scoreboard.sv(87) @ 190: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[2]: exp=dd actual=dd
+UVM_INFO scoreboard.sv(87) @ 190: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[3]: exp=7f actual=7f
+UVM_INFO scoreboard.sv(44) @ 210: uvm_test_top.router_env.m_scb [router_scoreboard] input1 -> queue0: tid=1 beats=2 first=f6
+UVM_INFO scoreboard.sv(87) @ 250: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[0]: exp=f6 actual=f6
+UVM_INFO scoreboard.sv(87) @ 250: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[1]: exp=bc actual=bc
+UVM_INFO scoreboard.sv(44) @ 310: uvm_test_top.router_env.m_scb [router_scoreboard] input2 -> queue0: tid=10 beats=4 first=1a
+UVM_INFO scoreboard.sv(87) @ 350: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[0]: exp=1a actual=1a
+UVM_INFO scoreboard.sv(87) @ 350: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[1]: exp=52 actual=52
+UVM_INFO scoreboard.sv(87) @ 350: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[2]: exp=5d actual=5d
+UVM_INFO scoreboard.sv(87) @ 350: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[3]: exp=64 actual=64
+UVM_INFO scoreboard.sv(44) @ 370: uvm_test_top.router_env.m_scb [router_scoreboard] input3 -> queue0: tid=11 beats=2 first=73
+UVM_INFO scoreboard.sv(87) @ 410: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[0]: exp=73 actual=73
+UVM_INFO scoreboard.sv(87) @ 410: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port0 beat[1]: exp=73 actual=73
+UVM_INFO scoreboard.sv(44) @ 410: uvm_test_top.router_env.m_scb [router_scoreboard] input0 -> queue1: tid=0 beats=1 first=2
+UVM_INFO scoreboard.sv(87) @ 450: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port1 beat[0]: exp=2 actual=2
+UVM_INFO scoreboard.sv(44) @ 470: uvm_test_top.router_env.m_scb [router_scoreboard] input1 -> queue1: tid=1 beats=2 first=7e
+UVM_INFO scoreboard.sv(87) @ 510: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port1 beat[0]: exp=7e actual=7e
+UVM_INFO scoreboard.sv(87) @ 510: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port1 beat[1]: exp=d4 actual=d4
+UVM_INFO scoreboard.sv(44) @ 570: uvm_test_top.router_env.m_scb [router_scoreboard] input2 -> queue1: tid=10 beats=4 first=8e
+UVM_INFO scoreboard.sv(87) @ 610: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port1 beat[0]: exp=8e actual=8e
+UVM_INFO scoreboard.sv(87) @ 610: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port1 beat[1]: exp=9e actual=9e
+UVM_INFO scoreboard.sv(87) @ 610: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port1 beat[2]: exp=7f actual=7f
+UVM_INFO scoreboard.sv(87) @ 610: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port1 beat[3]: exp=e5 actual=e5
+UVM_INFO scoreboard.sv(44) @ 650: uvm_test_top.router_env.m_scb [router_scoreboard] input3 -> queue1: tid=11 beats=3 first=2f
+UVM_INFO scoreboard.sv(87) @ 690: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port1 beat[0]: exp=2f actual=2f
+UVM_INFO scoreboard.sv(87) @ 690: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port1 beat[1]: exp=eb actual=eb
+UVM_INFO scoreboard.sv(87) @ 690: uvm_test_top.router_env.m_scb [router_scoreboard] [PASS] port1 beat[2]: exp=8d actual=8d
+UVM_INFO /xcelium25.03/tools/methodology/UVM/CDNS-1.2/sv/src/base/uvm_objection.svh(1271) @ 2650: reporter [TEST_DONE] 'run' phase is ready to proceed to the 'extract' phase
+UVM_INFO /xcelium25.03/tools/methodology/UVM/CDNS-1.2/sv/src/base/uvm_report_server.svh(851) @ 2650: reporter [UVM/REPORT/SERVER] 
+--- UVM Report Summary ---
+
+** Report counts by severity
+UVM_INFO :   33
+UVM_WARNING :    0
+UVM_ERROR :    0
+UVM_FATAL :    0
+** Report counts by id
+[RNTST]     1
+[TEST_DONE]     1
+[UVM/RELNOTES]     1
+[router_scoreboard]    30
+
+Simulation complete via $finish(1) at time 2650 NS + 59
+/xcelium25.03/tools/methodology/UVM/CDNS-1.2/sv/src/base/uvm_root.svh:543     $finish;
+xcelium> exit
+TOOL:	xrun	25.03-s001: Exiting on Apr 09, 2026 at 04:15:41 EDT  (total: 00:00:07)
