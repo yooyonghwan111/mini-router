@@ -41,7 +41,7 @@ class router_scoreboard #(parameter D_WIDTH=8) extends uvm_scoreboard;
         end
 
         `uvm_info(get_type_name(), $sformatf("input%0d -> queue%0d: tid=%0b beats=%0d first=%0h",
-                                                    data.s_port_id, data.s_tdest, data.s_tid, data.s_pkt_data.size(), data.s_pkt_data[0]), UVM_LOW)
+                                                    data.s_port_id, data.s_tdest, data.s_tid, data.s_pkt_data.size(), data.s_pkt_data[0]), UVM_MEDIUM)
     endfunction
 
 
@@ -84,7 +84,7 @@ class router_scoreboard #(parameter D_WIDTH=8) extends uvm_scoreboard;
                                                                 data.m_port_id, i, exp_pkt[i], data.m_pkt_data[i]))
             else
                 `uvm_info(get_type_name(), $sformatf("[PASS] port%0d beat[%0d]: exp=%0h actual=%0h",
-                                                                data.m_port_id, i, exp_pkt[i], data.m_pkt_data[i]), UVM_LOW)
+                                                                data.m_port_id, i, exp_pkt[i], data.m_pkt_data[i]), UVM_MEDIUM)
         end
     endfunction
 
