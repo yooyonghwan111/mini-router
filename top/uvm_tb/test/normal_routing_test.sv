@@ -1,0 +1,26 @@
+class normal_routing_test extends uvm_test;
+  `uvm_component_utils(normal_routing_test)
+
+  router_env          m_env;
+  normal_routing_seq  nr_seq;
+
+  function new(string name = "normal_routing_test", uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+
+  virtual function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    m_env  = router_env::type_id::create("router_env", this);
+    nr_seq = normal_routing_seq::type_id::create("nr_seq");
+  endfunction
+
+  virtual task run_phase(uvm_phase phase);
+    phase.raise_objection(this);
+
+        nr_seq.start(m_env.a_agent.seqr);
+
+    #2000;
+    phase.drop_objection(this);
+  endtask
+
+endclass
